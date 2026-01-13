@@ -42,22 +42,39 @@ export class HeaderComponent implements OnDestroy, OnInit {
   public correctionComments: string;
   public unsubscribe$ = new Subject<void>();
   public bulkUploadStatus = false;
+  public uploadContentStatus = false;
 
   constructor(private editorService: EditorService,
     public telemetryService: EditorTelemetryService,
     public configService: ConfigService) { }
 
   async ngOnInit() {
+    console.log('HeaderComponent: ngOnInit triggered');
     this.editorService.bulkUploadStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
+      console.log('Bulk upload status changed:', status);
       if (status === 'processing') {
         this.bulkUploadStatus = true;
       } else {
         this.bulkUploadStatus = false;
       }
     });
+    this.editorService.treeService.treeStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
+      console.log('Tree status changed:', status);
+      if (status === 'loaded' || status === 'added' || status === 'removed') {
+        this.updateContentStatus();
+      }
+    });
     this.objectType = _.get(this.editorService, 'editorConfig.config.objectType');
     await this.handleActionButtons();
     this.getSourcingData();
+    this.updateContentStatus();
+  }
+
+  updateContentStatus() {
+    const contentChildren = this.editorService.getContentChildrens();
+    this.uploadContentStatus = contentChildren.length > 0;
+    console.log('Tree Update - Content Children Count:', contentChildren.length);
+    console.log('Has Content:', this.uploadContentStatus);
   }
 
   async handleActionButtons() {
@@ -108,9 +125,9 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   firstLevelPublish() {
     if (this.editorService.isReviewerQualityCheckEnabled) {
-      this.toolbarEmitter.emit({button: 'saveQualityParameters'});
+      this.toolbarEmitter.emit({ button: 'saveQualityParameters' });
     } else {
-      this.buttonEmitter({type: 'publishQuestion'});
+      this.buttonEmitter({ type: 'publishQuestion' });
     }
   }
 
