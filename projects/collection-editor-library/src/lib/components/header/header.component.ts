@@ -74,6 +74,8 @@ export class HeaderComponent implements OnDestroy, OnInit {
     const contentChildren = this.editorService.getContentChildrens();
     this.uploadContentStatus = contentChildren.length > 0;
     console.log('Tree Update - Content Children Count:', contentChildren.length);
+    console.log('Tree Update - Content Children IDs:', contentChildren);
+    console.log('Tree Update - All Tree Nodes:', this.editorService.getTreeNodes());
     console.log('Has Content:', this.uploadContentStatus);
   }
 
