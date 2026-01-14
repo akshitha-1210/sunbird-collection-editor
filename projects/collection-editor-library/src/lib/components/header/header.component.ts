@@ -49,19 +49,11 @@ export class HeaderComponent implements OnDestroy, OnInit {
     public configService: ConfigService) { }
 
   async ngOnInit() {
-    console.log('HeaderComponent: ngOnInit triggered');
     this.editorService.bulkUploadStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
-      console.log('Bulk upload status changed:', status);
       if (status === 'processing') {
         this.bulkUploadStatus = true;
       } else {
         this.bulkUploadStatus = false;
-      }
-    });
-    this.editorService.treeService.treeStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
-      console.log('Tree status changed:', status);
-      if (status === 'loaded' || status === 'added' || status === 'removed') {
-        this.updateContentStatus();
       }
     });
     this.objectType = _.get(this.editorService, 'editorConfig.config.objectType');
@@ -127,9 +119,9 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   firstLevelPublish() {
     if (this.editorService.isReviewerQualityCheckEnabled) {
-      this.toolbarEmitter.emit({ button: 'saveQualityParameters' });
+      this.toolbarEmitter.emit({button: 'saveQualityParameters'});
     } else {
-      this.buttonEmitter({ type: 'publishQuestion' });
+      this.buttonEmitter({type: 'publishQuestion'});
     }
   }
 
